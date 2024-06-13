@@ -96,6 +96,16 @@ library BeaconChainProofs {
         bytes32 executionPayloadRoot;
     }
 
+    /// @notice This struct contains the data needed to verify a partial/full withdrawal zk proof
+    struct WithdrawalJournal {
+        uint64 validatorIndex;
+        uint64 withdrawalAmountGwei;
+        uint64 withdrawalTimestamp;
+        bytes32 beaconStateRoot;
+        bool fullWithdrawal;
+        bytes32 validatorPubkeyHash;
+    }
+
     /// @notice This struct contains the root and proof for verifying the state root against the oracle block root
     struct StateRootProof {
         bytes32 beaconStateRoot;
