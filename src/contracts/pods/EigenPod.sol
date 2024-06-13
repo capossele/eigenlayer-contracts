@@ -227,25 +227,19 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
      * @notice This function records full and partial withdrawals on behalf of one or more of this EigenPod's validators
      * @param oracleTimestamp is the timestamp of the oracle slot that the withdrawal is being proven against
      * @param stateRootProof proves a `beaconStateRoot` against a block root fetched from the oracle
-     * @param withdrawalProofs proves several withdrawal-related values against the `beaconStateRoot`
-     * @param validatorFieldsProofs proves `validatorFields` against the `beaconStateRoot`
-     * @param withdrawalFields are the fields of the withdrawals being proven
-     * @param validatorFields are the fields of the validators being proven
+     * @param withdrawalJournals proves several withdrawal-related values against the `beaconStateRoot`
      */
     function verifyAndProcessWithdrawals(
         uint64 oracleTimestamp,
         BeaconChainProofs.StateRootProof calldata stateRootProof,
-        BeaconChainProofs.WithdrawalProof[] calldata withdrawalProofs,
-        bytes[] calldata validatorFieldsProofs,
-        bytes32[][] calldata validatorFields,
-        bytes32[][] calldata withdrawalFields
+        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals
     ) external onlyWhenNotPaused(PAUSED_EIGENPODS_VERIFY_WITHDRAWAL) {
-        require(
-            (validatorFields.length == validatorFieldsProofs.length) &&
-                (validatorFieldsProofs.length == withdrawalProofs.length) &&
-                (withdrawalProofs.length == withdrawalFields.length),
-            "EigenPod.verifyAndProcessWithdrawals: inputs must be same length"
-        );
+        // require(
+        //     (validatorFields.length == validatorFieldsProofs.length) &&
+        //         (validatorFieldsProofs.length == withdrawalProofs.length) &&
+        //         (withdrawalProofs.length == withdrawalFields.length),
+        //     "EigenPod.verifyAndProcessWithdrawals: inputs must be same length"
+        // );
 
         // Verify passed-in beaconStateRoot against oracle-provided block root:
         BeaconChainProofs.verifyStateRootAgainstLatestBlockRoot({
@@ -255,13 +249,10 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
         });
 
         VerifiedWithdrawal memory withdrawalSummary;
-        for (uint256 i = 0; i < withdrawalFields.length; i++) {
+        for (uint256 i = 0; i < withdrawalJournals.length; i++) {
             VerifiedWithdrawal memory verifiedWithdrawal = _verifyAndProcessWithdrawal(
                 stateRootProof.beaconStateRoot,
-                withdrawalProofs[i],
-                validatorFieldsProofs[i],
-                validatorFields[i],
-                withdrawalFields[i]
+                withdrawalJournals[i]
             );
 
             withdrawalSummary.amountToSendGwei += verifiedWithdrawal.amountToSendGwei;
@@ -576,10 +567,7 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
 
     function _verifyAndProcessWithdrawal(
         bytes32 beaconStateRoot,
-        BeaconChainProofs.WithdrawalProof calldata withdrawalProof,
-        bytes calldata validatorFieldsProof,
-        bytes32[] calldata validatorFields,
-        bytes32[] calldata withdrawalFields
+        BeaconChainProofs.WithdrawalJournal calldata withdrawalJournal
     )
         internal
         /**
@@ -591,11 +579,11 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
          * This difference in modifier usage is OK, since it is still not possible to `verifyAndProcessWithdrawal` against a slot that occurred
          * *prior* to the proof provided in the `verifyWithdrawalCredentials` function.
          */
-        proofIsForValidTimestamp(withdrawalProof.getWithdrawalTimestamp())
+        proofIsForValidTimestamp(withdrawalJournal.withdrawalTimestamp)
         returns (VerifiedWithdrawal memory)
     {
-        uint64 withdrawalTimestamp = withdrawalProof.getWithdrawalTimestamp();
-        bytes32 validatorPubkeyHash = validatorFields.getPubkeyHash();
+        uint64 withdrawalTimestamp = withdrawalJournal.withdrawalTimestamp;
+        bytes32 validatorPubkeyHash = withdrawalJournal.validatorPubkeyHash;
 
         /**
          * Withdrawal processing should only be performed for "ACTIVE" or "WITHDRAWN" validators.
@@ -614,31 +602,31 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
 
         provenWithdrawal[validatorPubkeyHash][withdrawalTimestamp] = true;
 
-        // Verifying the withdrawal against verified beaconStateRoot:
-        BeaconChainProofs.verifyWithdrawal({
-            beaconStateRoot: beaconStateRoot, 
-            withdrawalFields: withdrawalFields, 
-            withdrawalProof: withdrawalProof,
-            denebForkTimestamp: eigenPodManager.denebForkTimestamp()
-        });
+        // // Verifying the withdrawal against verified beaconStateRoot:
+        // BeaconChainProofs.verifyWithdrawal({
+        //     beaconStateRoot: beaconStateRoot, 
+        //     withdrawalFields: withdrawalFields, 
+        //     withdrawalProof: withdrawalProof,
+        //     denebForkTimestamp: eigenPodManager.denebForkTimestamp()
+        // });
 
-        uint40 validatorIndex = withdrawalFields.getValidatorIndex();
+        uint40 validatorIndex = withdrawalJournal.validatorIndex;
 
-        // Verify passed-in validatorFields against verified beaconStateRoot:
-        BeaconChainProofs.verifyValidatorFields({
-            beaconStateRoot: beaconStateRoot,
-            validatorFields: validatorFields,
-            validatorFieldsProof: validatorFieldsProof,
-            validatorIndex: validatorIndex
-        });
+        // // Verify passed-in validatorFields against verified beaconStateRoot:
+        // BeaconChainProofs.verifyValidatorFields({
+        //     beaconStateRoot: beaconStateRoot,
+        //     validatorFields: validatorFields,
+        //     validatorFieldsProof: validatorFieldsProof,
+        //     validatorIndex: validatorIndex
+        // });
 
-        uint64 withdrawalAmountGwei = withdrawalFields.getWithdrawalAmountGwei();
+        uint64 withdrawalAmountGwei = withdrawalJournal.withdrawalAmountGwei;
         
         /**
          * If the withdrawal's epoch comes after the validator's "withdrawable epoch," we know the validator
          * has fully withdrawn, and we process this as a full withdrawal.
          */
-        if (withdrawalProof.getWithdrawalEpoch() >= validatorFields.getWithdrawableEpoch()) {
+        if (withdrawalJournal.fullWithdrawal) {
             return
                 _processFullWithdrawal(
                     validatorIndex,

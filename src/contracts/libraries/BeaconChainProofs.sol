@@ -98,7 +98,7 @@ library BeaconChainProofs {
 
     /// @notice This struct contains the data needed to verify a partial/full withdrawal zk proof
     struct WithdrawalJournal {
-        uint64 validatorIndex;
+        uint40 validatorIndex;
         uint64 withdrawalAmountGwei;
         uint64 withdrawalTimestamp;
         bytes32 beaconStateRoot;
