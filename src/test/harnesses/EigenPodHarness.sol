@@ -4,18 +4,22 @@ pragma solidity ^0.8.12;
 import "../../contracts/pods/EigenPod.sol";
 import "forge-std/Test.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+
 contract EPInternalFunctions is EigenPod, Test {
 
     constructor(
         IETHPOSDeposit _ethPOS,
         IDelayedWithdrawalRouter _delayedWithdrawalRouter,
         IEigenPodManager _eigenPodManager,
+        IRiscZeroVerifier _riscZeroVerifier,
         uint64 _MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
         uint64 _GENESIS_TIME
     ) EigenPod(
         _ethPOS,
         _delayedWithdrawalRouter,
         _eigenPodManager,
+        _riscZeroVerifier,
         _MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
         _GENESIS_TIME
     ) {}

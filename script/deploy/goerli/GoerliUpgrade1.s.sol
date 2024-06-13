@@ -21,6 +21,8 @@ import "../../../src/contracts/pods/DelayedWithdrawalRouter.sol";
 import "forge-std/Script.sol";
 import "forge-std/Test.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+
 // # To load the variables in the .env file
 // source .env
 
@@ -49,6 +51,7 @@ contract GoerliUpgrade1 is Script, Test {
         // IBeacon eigenPodBeacon = IBeacon(stdJson.readAddress(config_data, ".addresses.eigenPodBeacon"));
         ISlasher slasher = ISlasher(stdJson.readAddress(config_data, ".addresses.slasher"));
         IDelayedWithdrawalRouter delayedWithdrawalRouter = IDelayedWithdrawalRouter(stdJson.readAddress(config_data, ".addresses.delayedWithdrawalRouter"));
+        IRiscZeroVerifier riscZeroVerifier = IRiscZeroVerifier(stdJson.readAddress(config_data, ".addresses.riscZeroVerifier"));
 
         vm.startBroadcast();
 
@@ -72,6 +75,7 @@ contract GoerliUpgrade1 is Script, Test {
                 IETHPOSDeposit(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b),
                 delayedWithdrawalRouter,
                 eigenPodManager,
+                riscZeroVerifier,
                 32e9,
                 1616508000
             )

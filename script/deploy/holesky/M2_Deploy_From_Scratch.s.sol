@@ -3,6 +3,9 @@ pragma solidity ^0.8.12;
 
 import "../../utils/ExistingDeploymentParser.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+import "risc0/test/RiscZeroMockVerifier.sol";
+
 /**
  * @notice Script used for the first deployment of EigenLayer core contracts to Holesky
  * forge script script/deploy/holesky/M2_Deploy_From_Scratch.s.sol --rpc-url http://127.0.0.1:8545 --private-key $PRIVATE_KEY --broadcast -vvvv
@@ -71,11 +74,15 @@ contract M2_Deploy_Holesky_From_Scratch is ExistingDeploymentParser {
             address(new TransparentUpgradeableProxy(address(emptyContract), address(eigenLayerProxyAdmin), ""))
         );
 
+        // TODO: use a real risc zero verifier
+        IRiscZeroVerifier riscZeroVerifier = new RiscZeroMockVerifier(bytes4(0));
+
         // Deploy EigenPod Contracts
         eigenPodImplementation = new EigenPod(
             IETHPOSDeposit(ETHPOSDepositAddress),
             delayedWithdrawalRouter,
             eigenPodManager,
+            riscZeroVerifier,
             EIGENPOD_MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             EIGENPOD_GENESIS_TIME
         );

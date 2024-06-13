@@ -19,6 +19,9 @@ import "src/test/mocks/Reenterer.sol";
 import "src/test/events/IEigenPodEvents.sol";
 import "src/test/events/IEigenPodManagerEvents.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+import "risc0/test/RiscZeroMockVerifier.sol";
+
 contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
     // Contracts Under Test: EigenPodManager & EigenPod
     EigenPod public eigenPod;
@@ -32,6 +35,7 @@ contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
     IETHPOSDeposit public ethPOSMock;
     IDelayedWithdrawalRouter public delayedWithdrawalRouterMock;
     BeaconChainOracleMock beaconChainOracle;
+    IRiscZeroVerifier public riscZeroVerifierMock;
     
     // Constants
     uint64 public constant MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR = 32e9;
@@ -53,6 +57,7 @@ contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
         ethPOSMock = new ETHPOSDepositMock();
         delayedWithdrawalRouterMock = new DelayedWithdrawalRouterMock();
         beaconChainOracle = new BeaconChainOracleMock();
+        riscZeroVerifierMock = new RiscZeroMockVerifier(bytes4(0));
 
         // Deploy proxy contract for EPM
         EmptyContract emptyContract = new EmptyContract();
@@ -65,6 +70,7 @@ contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
             ethPOSMock,
             delayedWithdrawalRouterMock,
             eigenPodManager,
+            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             GOERLI_GENESIS_TIME
         );

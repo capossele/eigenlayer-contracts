@@ -28,6 +28,9 @@ import "../../../src/test/mocks/ETHDepositMock.sol";
 import "forge-std/Script.sol";
 import "forge-std/Test.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+import "risc0/test/RiscZeroMockVerifier.sol";
+
 // # To load the variables in the .env file
 // source .env
 
@@ -64,6 +67,8 @@ contract Deployer_M2 is Script, Test {
     UpgradeableBeacon public eigenPodBeacon;
     EigenPod public eigenPodImplementation;
     StrategyBase public baseStrategyImplementation;
+
+    IRiscZeroVerifier public riscZeroVerifier;
 
     EmptyContract public emptyContract;
 
@@ -176,6 +181,8 @@ contract Deployer_M2 is Script, Test {
             address(new TransparentUpgradeableProxy(address(emptyContract), address(eigenLayerProxyAdmin), ""))
         );
 
+        riscZeroVerifier = new RiscZeroMockVerifier(bytes4(0));
+
         // if on mainnet, use the ETH2 deposit contract address
         if (chainId == 1) {
             ethPOSDeposit = IETHPOSDeposit(0x00000000219ab540356cBB839Cbe05303d7705Fa);
@@ -187,6 +194,7 @@ contract Deployer_M2 is Script, Test {
             ethPOSDeposit,
             delayedWithdrawalRouter,
             eigenPodManager,
+            riscZeroVerifier,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             GOERLI_GENESIS_TIME
         );

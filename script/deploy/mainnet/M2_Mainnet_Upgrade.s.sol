@@ -5,6 +5,9 @@ import "../../utils/ExistingDeploymentParser.sol";
 import "../../utils/TimelockEncoding.sol";
 import "../../utils/Multisend.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+import "risc0/test/RiscZeroMockVerifier.sol";
+
 /**
  * @notice Script used for the first deployment of EigenLayer core contracts to Holesky
  * anvil --fork-url $RPC_MAINNET
@@ -61,11 +64,15 @@ contract M2_Mainnet_Upgrade is ExistingDeploymentParser {
             )
         );
 
+        // TODO: use a real risc zero verifier
+        IRiscZeroVerifier riscZeroVerifier = new RiscZeroMockVerifier(bytes4(0));
+
         // 2. Deploy Implementations
         eigenPodImplementation = new EigenPod(
             IETHPOSDeposit(ETHPOSDepositAddress),
             delayedWithdrawalRouter,
             eigenPodManager,
+            riscZeroVerifier,
             EIGENPOD_MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             EIGENPOD_GENESIS_TIME
         );

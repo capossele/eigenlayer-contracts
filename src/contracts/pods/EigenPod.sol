@@ -20,6 +20,8 @@ import "../interfaces/IPausable.sol";
 
 import "./EigenPodPausingConstants.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+
 /**
  * @title The implementation contract used for restaking beacon chain ETH on EigenLayer
  * @author Layr Labs, Inc.
@@ -58,6 +60,9 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
 
     /// @notice The single EigenPodManager for EigenLayer
     IEigenPodManager public immutable eigenPodManager;
+
+    /// @notice The RiscZero verifier contract used for verifying proofs
+    IRiscZeroVerifier public immutable riscZeroVerifier;
 
     ///@notice The maximum amount of ETH, in gwei, a validator can have restaked in the eigenlayer
     uint64 public immutable MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR;
@@ -144,12 +149,14 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
         IETHPOSDeposit _ethPOS,
         IDelayedWithdrawalRouter _delayedWithdrawalRouter,
         IEigenPodManager _eigenPodManager,
+        IRiscZeroVerifier _riscZeroVerifier,
         uint64 _MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
         uint64 _GENESIS_TIME
     ) {
         ethPOS = _ethPOS;
         delayedWithdrawalRouter = _delayedWithdrawalRouter;
         eigenPodManager = _eigenPodManager;
+        riscZeroVerifier = _riscZeroVerifier;
         MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR = _MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR;
         GENESIS_TIME = _GENESIS_TIME;
         _disableInitializers();

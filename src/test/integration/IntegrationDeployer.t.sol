@@ -29,6 +29,9 @@ import "src/test/integration/users/User_M1.t.sol";
 
 import "script/utils/ExistingDeploymentParser.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+import "risc0/test/RiscZeroMockVerifier.sol";
+
 abstract contract IntegrationDeployer is ExistingDeploymentParser {
 
     Vm cheats = Vm(HEVM_ADDRESS);
@@ -60,6 +63,7 @@ abstract contract IntegrationDeployer is ExistingDeploymentParser {
     ETHPOSDepositMock ethPOSDeposit;
     BeaconChainOracleMock public beaconChainOracle;
     BeaconChainMock public beaconChain;
+    IRiscZeroVerifier public riscZeroVerifierMock;
 
     // Admin Addresses
     address eigenLayerReputedMultisig = address(this); // admin address
@@ -223,6 +227,7 @@ abstract contract IntegrationDeployer is ExistingDeploymentParser {
         EmptyContract emptyContract = new EmptyContract();
         ethPOSDeposit = new ETHPOSDepositMock();
         beaconChainOracle = new BeaconChainOracleMock();
+        riscZeroVerifierMock = new RiscZeroMockVerifier(bytes4(0));
 
         /**
          * First, deploy upgradeable proxy contracts that **will point** to the implementations. Since the implementation contracts are
@@ -252,6 +257,7 @@ abstract contract IntegrationDeployer is ExistingDeploymentParser {
             ethPOSDeposit,
             delayedWithdrawalRouter,
             eigenPodManager,
+            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             0
         );
@@ -387,6 +393,7 @@ abstract contract IntegrationDeployer is ExistingDeploymentParser {
             ethPOSDeposit,
             delayedWithdrawalRouter,
             eigenPodManager,
+            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             0
         );
@@ -497,6 +504,7 @@ abstract contract IntegrationDeployer is ExistingDeploymentParser {
             ethPOSDeposit,
             delayedWithdrawalRouter,
             eigenPodManager,
+            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             0
         );
@@ -720,6 +728,7 @@ abstract contract IntegrationDeployer is ExistingDeploymentParser {
                 ethPOSDeposit,
                 eigenPodImplementation.delayedWithdrawalRouter(),
                 eigenPodImplementation.eigenPodManager(),
+                eigenPodImplementation.riscZeroVerifier(),
                 eigenPodImplementation.MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR(),
                 0
             );
