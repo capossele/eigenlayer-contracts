@@ -5,9 +5,6 @@ import "./EigenLayerTestHelper.t.sol";
 import "../contracts/core/StrategyManagerStorage.sol";
 import "./mocks/ERC20_OneWeiFeeOnTransfer.sol";
 
-import "risc0/IRiscZeroVerifier.sol";
-import "risc0/test/RiscZeroMockVerifier.sol";
-
 contract DepositWithdrawTests is EigenLayerTestHelper {
     uint256[] public emptyUintArray;
 
@@ -369,10 +366,8 @@ contract DepositWithdrawTests is EigenLayerTestHelper {
             address(new TransparentUpgradeableProxy(address(emptyContract), address(eigenLayerProxyAdmin), ""))
         );
 
-        IRiscZeroVerifier riscZeroVerifierMock = new RiscZeroMockVerifier(bytes4(0));
-
         ethPOSDeposit = new ETHPOSDepositMock();
-        pod = new EigenPod(ethPOSDeposit, delayedWithdrawalRouter, eigenPodManager, riscZeroVerifierMock, MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR, GOERLI_GENESIS_TIME);
+        pod = new EigenPod(ethPOSDeposit, delayedWithdrawalRouter, eigenPodManager, MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR, GOERLI_GENESIS_TIME);
 
         eigenPodBeacon = new UpgradeableBeacon(address(pod));
 

@@ -27,8 +27,6 @@ import "../../../src/test/mocks/ETHDepositMock.sol";
 import "forge-std/Script.sol";
 import "forge-std/Test.sol";
 
-import "risc0/IRiscZeroVerifier.sol";
-
 // # To load the variables in the .env file
 // source .env
 
@@ -70,8 +68,6 @@ contract Deployer_M1 is Script, Test {
     address operationsMultisig;
     address pauserMultisig;
 
-    address riscZeroVerifier;
-
     // the ETH2 deposit contract -- if not on mainnet, we deploy a mock as stand-in
     IETHPOSDeposit public ethPOSDeposit;
 
@@ -103,8 +99,6 @@ contract Deployer_M1 is Script, Test {
         // READ JSON CONFIG DATA
         string memory config_data = vm.readFile(deployConfigPath);
         // bytes memory parsedData = vm.parseJson(config_data);
-
-        riscZeroVerifier = stdJson.readAddress(config_data, ".riscZeroVerifierAddress");
 
         STRATEGY_MANAGER_INIT_PAUSED_STATUS = stdJson.readUint(config_data, ".strategyManager.init_paused_status");
         SLASHER_INIT_PAUSED_STATUS = stdJson.readUint(config_data, ".slasher.init_paused_status");
@@ -185,12 +179,10 @@ contract Deployer_M1 is Script, Test {
         } else {
             ethPOSDeposit = IETHPOSDeposit(stdJson.readAddress(config_data, ".ethPOSDepositAddress"));
         }
-
         eigenPodImplementation = new EigenPod(
             ethPOSDeposit,
             delayedWithdrawalRouter,
             eigenPodManager,
-            IRiscZeroVerifier(riscZeroVerifier),
             uint64(MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR),
             GOERLI_GENESIS_TIME
         );

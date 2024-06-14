@@ -14,9 +14,6 @@ import "src/test/utils/ProofParsing.sol";
 import "src/test/utils/EigenLayerUnitTestSetup.sol";
 import "src/test/events/IEigenPodEvents.sol";
 
-import "risc0/IRiscZeroVerifier.sol";
-import "risc0/test/RiscZeroMockVerifier.sol";
-
 contract EigenPodUnitTests is EigenLayerUnitTestSetup {
     // Contract Under Test: EigenPod
     EigenPod public eigenPod;
@@ -26,7 +23,6 @@ contract EigenPodUnitTests is EigenLayerUnitTestSetup {
     // Mocks
     IETHPOSDeposit public ethPOSDepositMock;
     IDelayedWithdrawalRouter public delayedWithdrawalRouterMock;
-    IRiscZeroVerifier public riscZeroVerifierMock;
     
     // Address of pod for which proofs were generated
     address podAddress = address(0x49c486E3f4303bc11C02F952Fe5b08D0AB22D443);
@@ -52,14 +48,12 @@ contract EigenPodUnitTests is EigenLayerUnitTestSetup {
         // Deploy mocks
         ethPOSDepositMock = new ETHPOSDepositMock();
         delayedWithdrawalRouterMock = new DelayedWithdrawalRouterMock();
-        riscZeroVerifierMock = new RiscZeroMockVerifier(bytes4(0));
 
         // Deploy EigenPod
         podImplementation = new EigenPod(
             ethPOSDepositMock,
             delayedWithdrawalRouterMock,
             eigenPodManagerMock,
-            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             GOERLI_GENESIS_TIME
         );
@@ -386,7 +380,6 @@ contract EigenPodHarnessSetup is EigenPodUnitTests {
             ethPOSDepositMock,
             delayedWithdrawalRouterMock,
             eigenPodManagerMock,
-            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             GOERLI_GENESIS_TIME
         );

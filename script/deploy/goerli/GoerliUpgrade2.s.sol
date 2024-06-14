@@ -17,8 +17,6 @@ import "../../../src/test/mocks/EmptyContract.sol";
 import "forge-std/Script.sol";
 import "forge-std/Test.sol";
 
-import "risc0/IRiscZeroVerifier.sol";
-
 // # To load the variables in the .env file
 // source .env
 
@@ -40,7 +38,6 @@ contract GoerliUpgrade2 is Script, Test {
     IBeacon eigenPodBeacon;
     EmptyContract emptyContract;
     ProxyAdmin eigenLayerProxyAdmin;
-    IRiscZeroVerifier riscZeroVerifier;
 
     function run() external {
         // read and log the chainID
@@ -57,7 +54,6 @@ contract GoerliUpgrade2 is Script, Test {
         eigenPodBeacon = IBeacon(stdJson.readAddress(config_data, ".addresses.eigenPodBeacon"));
         emptyContract = EmptyContract(stdJson.readAddress(config_data, ".addresses.emptyContract"));
         eigenLayerProxyAdmin = ProxyAdmin(stdJson.readAddress(config_data, ".addresses.eigenLayerProxyAdmin"));
-        riscZeroVerifier = IRiscZeroVerifier(stdJson.readAddress(config_data, ".addresses.riscZeroVerifier"));
 
         vm.startBroadcast();
 
@@ -95,7 +91,6 @@ contract GoerliUpgrade2 is Script, Test {
                 IETHPOSDeposit(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b),
                 delayedWithdrawalRouter,
                 eigenPodManager,
-                riscZeroVerifier,
                 32e9,
                 1616508000
             )

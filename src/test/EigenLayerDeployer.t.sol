@@ -32,9 +32,6 @@ import "./mocks/BeaconChainOracleMock.sol";
 
 import "forge-std/Test.sol";
 
-import "risc0/IRiscZeroVerifier.sol";
-import "risc0/test/RiscZeroMockVerifier.sol";
-
 contract EigenLayerDeployer is Operators {
     Vm cheats = Vm(HEVM_ADDRESS);
 
@@ -50,7 +47,6 @@ contract EigenLayerDeployer is Operators {
     IDelayedWithdrawalRouter public delayedWithdrawalRouter;
     IETHPOSDeposit public ethPOSDeposit;
     IBeacon public eigenPodBeacon;
-    IRiscZeroVerifier public riscZeroVerifier;
 
     // testing/mock contracts
     IERC20 public eigenToken;
@@ -166,7 +162,6 @@ contract EigenLayerDeployer is Operators {
         slasher = Slasher(slasherAddress);
         eigenPodManager = EigenPodManager(eigenPodManagerAddress);
         delayedWithdrawalRouter = DelayedWithdrawalRouter(delayedWithdrawalRouterAddress);
-        riscZeroVerifier = new RiscZeroMockVerifier(bytes4(0));
 
         beaconChainOracleAddress = address(new BeaconChainOracleMock());
 
@@ -175,7 +170,6 @@ contract EigenLayerDeployer is Operators {
             ethPOSDeposit,
             delayedWithdrawalRouter,
             eigenPodManager,
-            riscZeroVerifier,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             GOERLI_GENESIS_TIME
         );
@@ -244,15 +238,12 @@ contract EigenLayerDeployer is Operators {
         delayedWithdrawalRouter = DelayedWithdrawalRouter(
             address(new TransparentUpgradeableProxy(address(emptyContract), address(eigenLayerProxyAdmin), ""))
         );
-        riscZeroVerifier = new RiscZeroMockVerifier(bytes4(0));
-
 
         ethPOSDeposit = new ETHPOSDepositMock();
         pod = new EigenPod(
             ethPOSDeposit,
             delayedWithdrawalRouter,
             eigenPodManager,
-            riscZeroVerifier,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             GOERLI_GENESIS_TIME
         );

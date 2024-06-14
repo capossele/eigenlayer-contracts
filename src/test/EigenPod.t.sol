@@ -9,9 +9,6 @@ import "../contracts/libraries/BeaconChainProofs.sol";
 import "./mocks/BeaconChainOracleMock.sol";
 import "./harnesses/EigenPodHarness.sol";
 
-import "risc0/IRiscZeroVerifier.sol";
-import "risc0/test/RiscZeroMockVerifier.sol";
-
 contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
     using BytesLib for bytes;
     using BeaconChainProofs for *;
@@ -44,7 +41,6 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
     IETHPOSDeposit public ethPOSDeposit;
     UpgradeableBeacon public eigenPodBeacon;
     EPInternalFunctions public podInternalFunctionTester;
-    IRiscZeroVerifier public riscZeroVerifierMock;
 
     BeaconChainOracleMock public beaconChainOracle;
     address[] public slashingContracts;
@@ -159,7 +155,6 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         delayedWithdrawalRouter = DelayedWithdrawalRouter(
             address(new TransparentUpgradeableProxy(address(emptyContract), address(eigenLayerProxyAdmin), ""))
         );
-        riscZeroVerifierMock = new RiscZeroMockVerifier(bytes4(0));
 
         cheats.warp(GOERLI_GENESIS_TIME); // start at a sane timestamp
         ethPOSDeposit = new ETHPOSDepositMock();
@@ -167,7 +162,6 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             ethPOSDeposit,
             delayedWithdrawalRouter,
             IEigenPodManager(podManagerAddress),
-            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             GOERLI_GENESIS_TIME
         );
@@ -437,7 +431,6 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             ethPOSDeposit,
             delayedWithdrawalRouter,
             IEigenPodManager(podManagerAddress),
-            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             modifiedGenesisTime
         );
@@ -1802,7 +1795,6 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             ethPOSDeposit,
             delayedWithdrawalRouter,
             IEigenPodManager(podManagerAddress),
-            riscZeroVerifierMock,
             MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR,
             GOERLI_GENESIS_TIME
         );

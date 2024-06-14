@@ -22,9 +22,6 @@ import "../../../src/contracts/permissions/PauserRegistry.sol";
 import "forge-std/Script.sol";
 import "forge-std/Test.sol";
 
-import "risc0/IRiscZeroVerifier.sol";
-import "risc0/test/RiscZeroMockVerifier.sol";
-
 // # To load the variables in the .env file
 // source .env
 
@@ -160,15 +157,10 @@ contract M2Deploy is Script, Test {
             slasher,
             delegation
         );
-
-        // TODO: use a real risc zero verifier
-        IRiscZeroVerifier riscZeroVerifier = new RiscZeroMockVerifier(bytes4(0));
-
         eigenPodImplementation = new EigenPod({
             _ethPOS: ethPOS,
             _delayedWithdrawalRouter: delayedWithdrawalRouter,
             _eigenPodManager: eigenPodManager,
-            _riscZeroVerifier: riscZeroVerifier,
             _MAX_RESTAKED_BALANCE_GWEI_PER_VALIDATOR: 32 gwei,
             _GENESIS_TIME: 1616508000
         });
