@@ -70,7 +70,8 @@ contract EigenPodMock is IEigenPod, Test {
     function verifyAndProcessWithdrawals(
         uint64 oracleTimestamp,
         BeaconChainProofs.StateRootProof calldata stateRootProof,
-        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals
+        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals,
+        address verifier
     ) external {}
 
     /// @notice Called by the pod owner to withdraw the balance of the pod when `hasRestaked` is set to false

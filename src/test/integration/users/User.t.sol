@@ -17,6 +17,7 @@ import "src/test/integration/mocks/BeaconChainOracleMock.t.sol";
 
 import "src/contracts/libraries/BeaconChainProofs.sol";
 
+import "risc0/test/RiscZeroMockVerifier.sol";
 
 interface IUserDeployer {
     function delegationManager() external view returns (DelegationManager);
@@ -49,6 +50,8 @@ contract User is Test {
     IStrategy constant BEACONCHAIN_ETH_STRAT = IStrategy(0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0);
     IERC20 constant NATIVE_ETH = IERC20(0xbeaC0eeEeeeeEEeEeEEEEeeEEeEeeeEeeEEBEaC0);
     uint constant GWEI_TO_WEI = 1e9;
+
+    address public riscZeroVerifier = address(new RiscZeroMockVerifier(bytes4(0)));
 
     string public NAME;
 
@@ -329,7 +332,8 @@ contract User is Test {
                         pod.verifyAndProcessWithdrawals({
                             oracleTimestamp: proofs.oracleTimestamp,
                             stateRootProof: proofs.stateRootProof,
-                            withdrawalJournals: withdrawalJournals
+                            withdrawalJournals: withdrawalJournals,
+                            verifier: riscZeroVerifier
                         });
 
                         uint64 withdrawableAfter = pod.withdrawableRestakedExecutionLayerGwei();

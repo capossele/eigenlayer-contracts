@@ -192,11 +192,13 @@ interface IEigenPod {
      * @notice This function records full and partial withdrawals on behalf of one of the Ethereum validators for this EigenPod
      * @param oracleTimestamp is the timestamp of the oracle slot that the withdrawal is being proven against
      * @param withdrawalJournals is the information needed to check the veracity of the block numbers and withdrawals being proven
+     * @param verifier is the address of the risc zero verifier
      */
     function verifyAndProcessWithdrawals(
         uint64 oracleTimestamp,
         BeaconChainProofs.StateRootProof calldata stateRootProof,
-        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals
+        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals,
+        address verifier //TODO: remove this parameter and add it to the EigenPod constructor
     ) external;
 
     /**

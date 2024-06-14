@@ -19,6 +19,8 @@ import "src/test/mocks/Reenterer.sol";
 import "src/test/events/IEigenPodEvents.sol";
 import "src/test/events/IEigenPodManagerEvents.sol";
 
+import "risc0/test/RiscZeroMockVerifier.sol";
+
 contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
     // Contracts Under Test: EigenPodManager & EigenPod
     EigenPod public eigenPod;
@@ -44,6 +46,8 @@ contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
     address public constant podOwner = address(42000094993494);
 
     address public constant podAddress = address(0x49c486E3f4303bc11C02F952Fe5b08D0AB22D443);
+
+    address public riscZeroVerifier;
     
     function setUp() public override virtual {
         // Setup
@@ -119,6 +123,8 @@ contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
         EigenPodManagerWrapper(address(eigenPodManager)).setPodAddress(podOwner, eigenPod);
 
         eigenPodManager.setDenebForkTimestamp(type(uint64).max);
+
+        riscZeroVerifier = address(new RiscZeroMockVerifier(bytes4(0)));
     }
 }
 
@@ -171,7 +177,8 @@ contract EigenPod_PodManager_UnitTests_EigenPodPausing is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray
+            withdrawalJournalsArray,
+            address(riscZeroVerifier)
         );
     }
 
@@ -393,7 +400,8 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray
+            withdrawalJournalsArray,
+            address(riscZeroVerifier)
         );
 
         // Checks
@@ -455,7 +463,8 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray
+            withdrawalJournalsArray,
+            address(riscZeroVerifier)
         );
 
         // Checks
@@ -498,7 +507,8 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray
+            withdrawalJournalsArray,
+            address(riscZeroVerifier)
         );
 
         // Checks

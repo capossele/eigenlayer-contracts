@@ -9,6 +9,8 @@ import "../contracts/libraries/BeaconChainProofs.sol";
 import "./mocks/BeaconChainOracleMock.sol";
 import "./harnesses/EigenPodHarness.sol";
 
+import "risc0/test/RiscZeroMockVerifier.sol";
+
 contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
     using BytesLib for bytes;
     using BeaconChainProofs for *;
@@ -41,6 +43,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
     IETHPOSDeposit public ethPOSDeposit;
     UpgradeableBeacon public eigenPodBeacon;
     EPInternalFunctions public podInternalFunctionTester;
+
+    address public riscZeroVerifier;
 
     BeaconChainOracleMock public beaconChainOracle;
     address[] public slashingContracts;
@@ -255,6 +259,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
                 withdrawalDelayBlocks
             )
         );
+
+        riscZeroVerifier = address(new RiscZeroMockVerifier(bytes4(0)));
 
         cheats.deal(address(podOwner), 5 * stakeAmount);
 
@@ -686,7 +692,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             pod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalJournalsArray
+                withdrawalJournalsArray,
+                riscZeroVerifier
             );
         }
     }
@@ -706,7 +713,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             pod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalJournalsArray
+                withdrawalJournalsArray,
+                riscZeroVerifier
             );
         }
     }
@@ -755,7 +763,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             newPod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalJournalsArray
+                withdrawalJournalsArray,
+                riscZeroVerifier
             );
             require(
                 newPod.provenWithdrawal(
@@ -802,7 +811,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         newPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray
+            withdrawalJournalsArray,
+            riscZeroVerifier
         );
     }
 
@@ -832,7 +842,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         newPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray
+            withdrawalJournalsArray,
+            riscZeroVerifier
         );
 
         return newPod;
@@ -1484,7 +1495,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             newPod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalJournalsArray
+                withdrawalJournalsArray,
+                riscZeroVerifier
             );
         }
         require(

@@ -232,7 +232,8 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
     function verifyAndProcessWithdrawals(
         uint64 oracleTimestamp,
         BeaconChainProofs.StateRootProof calldata stateRootProof,
-        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals
+        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals,
+        address verifier //TODO: remove this parameter and add it to the EigenPod constructor 
     ) external onlyWhenNotPaused(PAUSED_EIGENPODS_VERIFY_WITHDRAWAL) {
         // require(
         //     (validatorFields.length == validatorFieldsProofs.length) &&
