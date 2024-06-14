@@ -10,10 +10,12 @@ import "./mocks/BeaconChainOracleMock.sol";
 import "./harnesses/EigenPodHarness.sol";
 
 import "risc0/test/RiscZeroMockVerifier.sol";
+import {ReceiptClaimLib, ReceiptClaim} from "risc0/IRiscZeroVerifier.sol";
 
 contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
     using BytesLib for bytes;
     using BeaconChainProofs for *;
+    using ReceiptClaimLib for ReceiptClaim;
 
 
     uint256 internal constant GWEI_TO_WEI = 1e9;
@@ -67,6 +69,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
     uint64 RESTAKED_BALANCE_OFFSET_GWEI = 75e7;
     uint64 internal constant GOERLI_GENESIS_TIME = 1616508000;
     uint64 internal constant SECONDS_PER_SLOT = 12;
+
+    bytes32 constant imageId = 0xb794ff0943a040616f3c44f2a736300c7ff5881942d4a32458d8ffc9aa1436ff;
 
     // bytes validatorPubkey = hex"93a0dd04ccddf3f1b419fdebf99481a2182c17d67cf14d32d6e50fc4bf8effc8db4a04b7c2f3a5975c1b9b74e2841888";
 
@@ -687,12 +691,16 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
             withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+            bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+            bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+
             BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
             pod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
                 withdrawalJournalsArray,
+                seal,
                 riscZeroVerifier
             );
         }
@@ -705,6 +713,9 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
             withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+            bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+            bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+
             BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
             cheats.expectRevert(
@@ -714,6 +725,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
                 0,
                 stateRootProofStruct,
                 withdrawalJournalsArray,
+                seal,
                 riscZeroVerifier
             );
         }
@@ -748,6 +760,10 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
             withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+            bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+            bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+            console2.logBytes32(claimDigest);
+
             uint256 delayedWithdrawalRouterContractBalanceBefore = address(delayedWithdrawalRouter).balance;
 
             BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
@@ -764,6 +780,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
                 0,
                 stateRootProofStruct,
                 withdrawalJournalsArray,
+                seal,
                 riscZeroVerifier
             );
             require(
@@ -803,6 +820,9 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
         withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+        bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+        bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+
         BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
         cheats.expectRevert(
@@ -812,6 +832,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             0,
             stateRootProofStruct,
             withdrawalJournalsArray,
+            seal,
             riscZeroVerifier
         );
     }
@@ -834,6 +855,9 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
         withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+        bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+        bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+
         BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
         cheats.expectRevert(
@@ -843,6 +867,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             0,
             stateRootProofStruct,
             withdrawalJournalsArray,
+            seal,
             riscZeroVerifier
         );
 
@@ -1490,12 +1515,16 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             );
             withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+            bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+            bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+
             BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
             newPod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
                 withdrawalJournalsArray,
+                seal,
                 riscZeroVerifier
             );
         }

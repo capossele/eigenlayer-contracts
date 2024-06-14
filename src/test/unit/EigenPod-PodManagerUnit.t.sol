@@ -20,8 +20,10 @@ import "src/test/events/IEigenPodEvents.sol";
 import "src/test/events/IEigenPodManagerEvents.sol";
 
 import "risc0/test/RiscZeroMockVerifier.sol";
+import {ReceiptClaimLib, ReceiptClaim} from "risc0/IRiscZeroVerifier.sol";
 
 contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
+    using ReceiptClaimLib for ReceiptClaim;
     // Contracts Under Test: EigenPodManager & EigenPod
     EigenPod public eigenPod;
     EigenPod public podImplementation;
@@ -48,6 +50,7 @@ contract EigenPod_PodManager_UnitTests is EigenLayerUnitTestSetup {
     address public constant podAddress = address(0x49c486E3f4303bc11C02F952Fe5b08D0AB22D443);
 
     address public riscZeroVerifier;
+    bytes32 constant imageId = 0xb794ff0943a040616f3c44f2a736300c7ff5881942d4a32458d8ffc9aa1436ff;
     
     function setUp() public override virtual {
         // Setup
@@ -178,6 +181,7 @@ contract EigenPod_PodManager_UnitTests_EigenPodPausing is EigenPod_PodManager_Un
             0,
             stateRootProofStruct,
             withdrawalJournalsArray,
+            bytes(""),
             address(riscZeroVerifier)
         );
     }
@@ -259,6 +263,7 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
      */
 
     using BeaconChainProofs for *;
+    using ReceiptClaimLib for ReceiptClaim;
 
     // Params to verify withdrawal credentials
     BeaconChainProofs.StateRootProof stateRootProofStruct; 
@@ -396,11 +401,15 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
         withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+        bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+        bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+        
         // Withdraw
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
             withdrawalJournalsArray,
+            seal,
             address(riscZeroVerifier)
         );
 
@@ -459,11 +468,15 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
         withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+        bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+        bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+
         // Withdraw
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
             withdrawalJournalsArray,
+            seal,
             address(riscZeroVerifier)
         );
 
@@ -503,11 +516,15 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
         withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
+        bytes32 claimDigest = ReceiptClaimLib.ok(imageId, sha256(abi.encode(withdrawalJournalsArray[0]))).digest();
+        bytes memory seal = abi.encodePacked(bytes4(0), claimDigest);
+
         // Withdraw
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
             withdrawalJournalsArray,
+            seal,
             address(riscZeroVerifier)
         );
 

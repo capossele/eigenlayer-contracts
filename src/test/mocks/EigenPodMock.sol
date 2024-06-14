@@ -71,6 +71,7 @@ contract EigenPodMock is IEigenPod, Test {
         uint64 oracleTimestamp,
         BeaconChainProofs.StateRootProof calldata stateRootProof,
         BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals,
+        bytes calldata seal,
         address verifier
     ) external {}
 

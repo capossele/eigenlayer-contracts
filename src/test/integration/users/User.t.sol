@@ -333,6 +333,7 @@ contract User is Test {
                             oracleTimestamp: proofs.oracleTimestamp,
                             stateRootProof: proofs.stateRootProof,
                             withdrawalJournals: withdrawalJournals,
+                            seal: bytes(""),
                             verifier: riscZeroVerifier
                         });
 

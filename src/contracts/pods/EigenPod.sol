@@ -20,6 +20,8 @@ import "../interfaces/IPausable.sol";
 
 import "./EigenPodPausingConstants.sol";
 
+import "risc0/IRiscZeroVerifier.sol";
+
 /**
  * @title The implementation contract used for restaking beacon chain ETH on EigenLayer
  * @author Layr Labs, Inc.
@@ -96,6 +98,8 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
 
     /// @notice Number of validators with proven withdrawal credentials, who do not have proven full withdrawals
     uint256 activeValidatorCount;
+
+    bytes32 public immutable imageId = 0xb794ff0943a040616f3c44f2a736300c7ff5881942d4a32458d8ffc9aa1436ff;
 
     modifier onlyEigenPodManager() {
         require(msg.sender == address(eigenPodManager), "EigenPod.onlyEigenPodManager: not eigenPodManager");
@@ -233,6 +237,7 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
         uint64 oracleTimestamp,
         BeaconChainProofs.StateRootProof calldata stateRootProof,
         BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals,
+        bytes calldata seal,
         address verifier //TODO: remove this parameter and add it to the EigenPod constructor 
     ) external onlyWhenNotPaused(PAUSED_EIGENPODS_VERIFY_WITHDRAWAL) {
         // require(
@@ -242,6 +247,10 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
         //     "EigenPod.verifyAndProcessWithdrawals: inputs must be same length"
         // );
 
+        IRiscZeroVerifier verifier = IRiscZeroVerifier(verifier);
+        bytes32 journalDigest = sha256(abi.encode(withdrawalJournals[0]));
+        verifier.verify(seal, imageId, journalDigest);
+        
         // Verify passed-in beaconStateRoot against oracle-provided block root:
         BeaconChainProofs.verifyStateRootAgainstLatestBlockRoot({
             latestBlockRoot: eigenPodManager.getBlockRootAtTimestamp(oracleTimestamp),
