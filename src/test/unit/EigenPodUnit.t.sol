@@ -712,6 +712,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
     // Params to process withdrawal 
     bytes32 beaconStateRoot;
     BeaconChainProofs.WithdrawalProof withdrawalToProve;
+    BeaconChainProofs.WithdrawalJournal withdrawalJournal;
     bytes validatorFieldsProof;
     bytes32[] validatorFields;
     bytes32[] withdrawalFields;
@@ -734,10 +735,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         cheats.expectRevert("EigenPod.proofIsForValidTimestamp: beacon chain proof must be at or after mostRecentWithdrawalTimestamp");
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
     }
 
@@ -753,10 +751,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         cheats.expectRevert("EigenPod._verifyAndProcessWithdrawal: Validator never proven to have withdrawal credentials pointed to this contract");
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
     }
 
@@ -768,20 +763,14 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         // Process withdrawal
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
 
         // Attempt to process again
         cheats.expectRevert("EigenPod._verifyAndProcessWithdrawal: withdrawal has already been proven for this timestamp");
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
     }
 
@@ -793,10 +782,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         // Process withdrawal
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
 
         // Verify storage
@@ -818,10 +804,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         // Process withdrawal
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
 
         // Verify storage
@@ -842,10 +825,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         cheats.expectRevert("EigenPod.proofIsForValidTimestamp: beacon chain proof must be at or after mostRecentWithdrawalTimestamp");
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
     }
 
@@ -866,10 +846,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         emit FullWithdrawalRedeemed(validatorIndex, withdrawalTimestamp, podOwner, withdrawalAmountGwei);
         IEigenPod.VerifiedWithdrawal memory vw = eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
 
         // Storage checks in _verifyAndProcessWithdrawal
@@ -902,10 +879,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         // Process full withdrawal
         IEigenPod.VerifiedWithdrawal memory vw = eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
 
         // Storage checks in _verifyAndProcessWithdrawal
@@ -936,17 +910,14 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         uint64 withdrawalAmountGwei = withdrawalFields.getWithdrawalAmountGwei();
         
         // Assert that partial withdrawal code path will be tested
-        assertLt(withdrawalToProve.getWithdrawalEpoch(), validatorFields.getWithdrawableEpoch(), "Withdrawal epoch should be less than the withdrawable epoch");
+        assertLt(withdrawalToProve.getWithdrawalEpoch(), validatorFields.getWithdrawableEpoch(), "Withdrawal epoch should be less than the withdrawable epoch");   
 
         // Process partial withdrawal
         vm.expectEmit(true, true, true, true);
         emit PartialWithdrawalRedeemed(validatorIndex, withdrawalTimestamp, podOwner, withdrawalAmountGwei);
         IEigenPod.VerifiedWithdrawal memory vw = eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalToProve,
-            validatorFieldsProof,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournal
         );
 
         // Storage checks in _verifyAndProcessWithdrawal
@@ -1039,6 +1010,24 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         validatorFieldsProof = abi.encodePacked(getValidatorProof());
         withdrawalToProve = _getWithdrawalProof();  
         withdrawalFields = getWithdrawalFields();
+        withdrawalJournal = _getWithdrawalJournal();
+    }
+
+    function _getWithdrawalJournal() internal returns (BeaconChainProofs.WithdrawalJournal memory) {
+        bytes32 beaconStateRoot = getBeaconStateRoot();
+        bytes32[] memory withdrawalFields = getWithdrawalFields();
+        bytes32[] memory validatorFields = getValidatorFields();
+        bytes32 validatorPubkeyHash = validatorFields.getPubkeyHash();
+        BeaconChainProofs.WithdrawalProof memory withdrawalProof = _getWithdrawalProof();
+        bool fullWithdrawal = withdrawalProof.getWithdrawalEpoch() >= validatorFields.getWithdrawableEpoch();
+        return BeaconChainProofs.WithdrawalJournal(
+            withdrawalFields.getValidatorIndex(),
+            withdrawalFields.getWithdrawalAmountGwei(),
+            withdrawalProof.getWithdrawalTimestamp(),
+            beaconStateRoot,
+            fullWithdrawal,
+            validatorPubkeyHash
+        );
     }
 
     /// @notice this function just generates a valid proof so that we can test other functionalities of the withdrawal flow

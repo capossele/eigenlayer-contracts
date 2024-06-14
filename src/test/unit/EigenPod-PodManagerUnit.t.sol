@@ -160,11 +160,7 @@ contract EigenPod_PodManager_UnitTests_EigenPodPausing is EigenPod_PodManager_Un
 
     function test_verifyAndProcessWithdrawals_revert_pausedEigenVerifyWithdrawal() public {
         BeaconChainProofs.StateRootProof memory stateRootProofStruct;
-        BeaconChainProofs.WithdrawalProof[] memory withdrawalProofsArray;
-
-        bytes[] memory validatorFieldsProofArray = new bytes[](1);
-        bytes32[][] memory validatorFieldsArray = new bytes32[][](1);
-        bytes32[][] memory withdrawalFieldsArray = new bytes32[][](1);
+        BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray;
 
         // pause the contract
         cheats.prank(address(pauser));
@@ -175,10 +171,7 @@ contract EigenPod_PodManager_UnitTests_EigenPodPausing is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalProofsArray,
-            validatorFieldsProofArray,
-            validatorFieldsArray,
-            withdrawalFieldsArray
+            withdrawalJournalsArray
         );
     }
 
@@ -393,14 +386,14 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         cheats.deal(address(eigenPod), leftOverBalanceWEI);
         int256 initialShares = eigenPodManager.podOwnerShares(podOwner);
 
+        BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
+        withdrawalJournalsArray[0] = _getWithdrawalJournal();
+
         // Withdraw
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalProofs,
-            validatorFieldsProofs,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournalsArray
         );
 
         // Checks
@@ -455,14 +448,14 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         );
         int256 initialShares = eigenPodManager.podOwnerShares(podOwner);
 
+        BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
+        withdrawalJournalsArray[0] = _getWithdrawalJournal();
+
         // Withdraw
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalProofs,
-            validatorFieldsProofs,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournalsArray
         );
 
         // Checks
@@ -498,14 +491,14 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         uint64 initialRestakedBalance = (eigenPod.validatorPubkeyHashToInfo(validatorPubkeyHash)).restakedBalanceGwei;
         int256 initialShares = eigenPodManager.podOwnerShares(podOwner);
 
+        BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
+        withdrawalJournalsArray[0] = _getWithdrawalJournal();
+
         // Withdraw
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalProofs,
-            validatorFieldsProofs,
-            validatorFields,
-            withdrawalFields
+            withdrawalJournalsArray
         );
 
         // Checks
@@ -618,6 +611,23 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
     //     );
     //     return proofs;
     // }
+
+    function _getWithdrawalJournal() internal returns (BeaconChainProofs.WithdrawalJournal memory) {
+        bytes32 beaconStateRoot = getBeaconStateRoot();
+        bytes32[] memory withdrawalFields = getWithdrawalFields();
+        bytes32[] memory validatorFields = getValidatorFields();
+        bytes32 validatorPubkeyHash = validatorFields.getPubkeyHash();
+        BeaconChainProofs.WithdrawalProof memory withdrawalProof = _getWithdrawalProof();
+        bool fullWithdrawal = withdrawalProof.getWithdrawalEpoch() >= validatorFields.getWithdrawableEpoch();
+        return BeaconChainProofs.WithdrawalJournal(
+            withdrawalFields.getValidatorIndex(),
+            withdrawalFields.getWithdrawalAmountGwei(),
+            withdrawalProof.getWithdrawalTimestamp(),
+            beaconStateRoot,
+            fullWithdrawal,
+            validatorPubkeyHash
+        );
+    }
 
     /// @notice this function just generates a valid proof so that we can test other functionalities of the withdrawal flow
     function _getWithdrawalProof() internal returns (BeaconChainProofs.WithdrawalProof memory) {

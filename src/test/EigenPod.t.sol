@@ -678,26 +678,15 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         ) * uint64(GWEI_TO_WEI);
         cheats.deal(address(pod), leftOverBalanceWEI);
         {
-            BeaconChainProofs.WithdrawalProof[] memory withdrawalProofsArray = new BeaconChainProofs.WithdrawalProof[](
-                1
-            );
-            withdrawalProofsArray[0] = _getWithdrawalProof();
-            bytes[] memory validatorFieldsProofArray = new bytes[](1);
-            validatorFieldsProofArray[0] = abi.encodePacked(getValidatorProof());
-            bytes32[][] memory validatorFieldsArray = new bytes32[][](1);
-            validatorFieldsArray[0] = getValidatorFields();
-            bytes32[][] memory withdrawalFieldsArray = new bytes32[][](1);
-            withdrawalFieldsArray[0] = withdrawalFields;
+            BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
+            withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
             BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
             pod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalProofsArray,
-                validatorFieldsProofArray,
-                validatorFieldsArray,
-                withdrawalFieldsArray
+                withdrawalJournalsArray
             );
         }
     }
@@ -706,16 +695,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         IEigenPod pod = testFullWithdrawalFlow();
 
         {
-            BeaconChainProofs.WithdrawalProof[] memory withdrawalProofsArray = new BeaconChainProofs.WithdrawalProof[](
-                1
-            );
-            withdrawalProofsArray[0] = _getWithdrawalProof();
-            bytes[] memory validatorFieldsProofArray = new bytes[](1);
-            validatorFieldsProofArray[0] = abi.encodePacked(getValidatorProof());
-            bytes32[][] memory validatorFieldsArray = new bytes32[][](1);
-            validatorFieldsArray[0] = getValidatorFields();
-            bytes32[][] memory withdrawalFieldsArray = new bytes32[][](1);
-            withdrawalFieldsArray[0] = withdrawalFields;
+            BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
+            withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
             BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
@@ -725,10 +706,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             pod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalProofsArray,
-                validatorFieldsProofArray,
-                validatorFieldsArray,
-                withdrawalFieldsArray
+                withdrawalJournalsArray
             );
         }
     }
@@ -759,16 +737,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
 
         cheats.deal(address(newPod), stakeAmount);
         {
-            BeaconChainProofs.WithdrawalProof[] memory withdrawalProofsArray = new BeaconChainProofs.WithdrawalProof[](
-                1
-            );
-            withdrawalProofsArray[0] = withdrawalProofs;
-            bytes[] memory validatorFieldsProofArray = new bytes[](1);
-            validatorFieldsProofArray[0] = validatorFieldsProof;
-            bytes32[][] memory validatorFieldsArray = new bytes32[][](1);
-            validatorFieldsArray[0] = validatorFields;
-            bytes32[][] memory withdrawalFieldsArray = new bytes32[][](1);
-            withdrawalFieldsArray[0] = withdrawalFields;
+            BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
+            withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
             uint256 delayedWithdrawalRouterContractBalanceBefore = address(delayedWithdrawalRouter).balance;
 
@@ -785,10 +755,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             newPod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalProofsArray,
-                validatorFieldsProofArray,
-                validatorFieldsArray,
-                withdrawalFieldsArray
+                withdrawalJournalsArray
             );
             require(
                 newPod.provenWithdrawal(
@@ -824,14 +791,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         withdrawalFields = getWithdrawalFields();
         validatorFields = getValidatorFields();
 
-        BeaconChainProofs.WithdrawalProof[] memory withdrawalProofsArray = new BeaconChainProofs.WithdrawalProof[](1);
-        withdrawalProofsArray[0] = withdrawalProofs;
-        bytes[] memory validatorFieldsProofArray = new bytes[](1);
-        validatorFieldsProofArray[0] = validatorFieldsProof;
-        bytes32[][] memory validatorFieldsArray = new bytes32[][](1);
-        validatorFieldsArray[0] = validatorFields;
-        bytes32[][] memory withdrawalFieldsArray = new bytes32[][](1);
-        withdrawalFieldsArray[0] = withdrawalFields;
+        BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
+        withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
         BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
@@ -841,10 +802,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         newPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalProofsArray,
-            validatorFieldsProofArray,
-            validatorFieldsArray,
-            withdrawalFieldsArray
+            withdrawalJournalsArray
         );
     }
 
@@ -863,14 +821,8 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         withdrawalFields = getWithdrawalFields();
         validatorFields = getValidatorFields();
 
-        BeaconChainProofs.WithdrawalProof[] memory withdrawalProofsArray = new BeaconChainProofs.WithdrawalProof[](1);
-        withdrawalProofsArray[0] = withdrawalProofs;
-        bytes[] memory validatorFieldsProofArray = new bytes[](1);
-        validatorFieldsProofArray[0] = validatorFieldsProof;
-        bytes32[][] memory validatorFieldsArray = new bytes32[][](1);
-        validatorFieldsArray[0] = validatorFields;
-        bytes32[][] memory withdrawalFieldsArray = new bytes32[][](1);
-        withdrawalFieldsArray[0] = withdrawalFields;
+        BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](1);
+        withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
         BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
@@ -880,10 +832,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         newPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalProofsArray,
-            validatorFieldsProofArray,
-            validatorFieldsArray,
-            withdrawalFieldsArray
+            withdrawalJournalsArray
         );
 
         return newPod;
@@ -1525,26 +1474,17 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
 
         uint256 delayedWithdrawalRouterContractBalanceBefore = address(delayedWithdrawalRouter).balance;
         {
-            BeaconChainProofs.WithdrawalProof[] memory withdrawalProofsArray = new BeaconChainProofs.WithdrawalProof[](
+            BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournalsArray = new BeaconChainProofs.WithdrawalJournal[](
                 1
             );
-            withdrawalProofsArray[0] = _getWithdrawalProof();
-            bytes[] memory validatorFieldsProofArray = new bytes[](1);
-            validatorFieldsProofArray[0] = abi.encodePacked(getValidatorProof());
-            bytes32[][] memory validatorFieldsArray = new bytes32[][](1);
-            validatorFieldsArray[0] = getValidatorFields();
-            bytes32[][] memory withdrawalFieldsArray = new bytes32[][](1);
-            withdrawalFieldsArray[0] = withdrawalFields;
+            withdrawalJournalsArray[0] = _getWithdrawalJournal();
 
             BeaconChainProofs.StateRootProof memory stateRootProofStruct = _getStateRootProof();
 
             newPod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalProofsArray,
-                validatorFieldsProofArray,
-                validatorFieldsArray,
-                withdrawalFieldsArray
+                withdrawalJournalsArray
             );
         }
         require(
@@ -1781,6 +1721,23 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
 
     function _getStateRootProof() internal returns (BeaconChainProofs.StateRootProof memory) {
         return BeaconChainProofs.StateRootProof(getBeaconStateRoot(), abi.encodePacked(getStateRootProof()));
+    }
+
+    function _getWithdrawalJournal() internal returns (BeaconChainProofs.WithdrawalJournal memory) {
+        bytes32 beaconStateRoot = getBeaconStateRoot();
+        bytes32[] memory withdrawalFields = getWithdrawalFields();
+        bytes32[] memory validatorFields = getValidatorFields();
+        bytes32 validatorPubkeyHash = validatorFields.getPubkeyHash();
+        BeaconChainProofs.WithdrawalProof memory withdrawalProof = _getWithdrawalProof();
+        bool fullWithdrawal = withdrawalProof.getWithdrawalEpoch() >= validatorFields.getWithdrawableEpoch();
+        return BeaconChainProofs.WithdrawalJournal(
+            withdrawalFields.getValidatorIndex(),
+            withdrawalFields.getWithdrawalAmountGwei(),
+            withdrawalProof.getWithdrawalTimestamp(),
+            beaconStateRoot,
+            fullWithdrawal,
+            validatorPubkeyHash
+        );
     }
 
     /// @notice this function just generates a valid proof so that we can test other functionalities of the withdrawal flow

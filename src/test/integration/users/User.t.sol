@@ -15,6 +15,8 @@ import "src/test/integration/TimeMachine.t.sol";
 import "src/test/integration/mocks/BeaconChainMock.t.sol";
 import "src/test/integration/mocks/BeaconChainOracleMock.t.sol";
 
+import "src/contracts/libraries/BeaconChainProofs.sol";
+
 
 interface IUserDeployer {
     function delegationManager() external view returns (DelegationManager);
@@ -26,6 +28,7 @@ interface IUserDeployer {
 }
 
 contract User is Test {
+    using BeaconChainProofs for *;
 
     Vm cheats = Vm(HEVM_ADDRESS);
 
@@ -308,16 +311,25 @@ contract User is Test {
 
                         uint40 validatorIndex = validators[j];
                         BeaconWithdrawal memory proofs = beaconChain.exitValidator(validatorIndex);
+                        uint numProofs = proofs.withdrawalProofs.length;
+                        BeaconChainProofs.WithdrawalJournal[] memory withdrawalJournals = new BeaconChainProofs.WithdrawalJournal[](numProofs);
+                        for (uint k = 0; k < numProofs; k++) {
+                            withdrawalJournals[k] = BeaconChainProofs.WithdrawalJournal({
+                                validatorIndex: validatorIndex,
+                                withdrawalAmountGwei: BeaconChainProofs.getWithdrawalAmountGwei(proofs.withdrawalFields[k]),
+                                withdrawalTimestamp: proofs.withdrawalProofs[k].getWithdrawalTimestamp(),
+                                beaconStateRoot: proofs.stateRootProof.beaconStateRoot,
+                                fullWithdrawal: proofs.withdrawalProofs[k].getWithdrawalEpoch() >= proofs.validatorFields[k].getWithdrawableEpoch(),
+                                validatorPubkeyHash: proofs.validatorFields[k].getPubkeyHash()
+                            });
+                        }
 
                         uint64 withdrawableBefore = pod.withdrawableRestakedExecutionLayerGwei();
 
                         pod.verifyAndProcessWithdrawals({
                             oracleTimestamp: proofs.oracleTimestamp,
                             stateRootProof: proofs.stateRootProof,
-                            withdrawalProofs: proofs.withdrawalProofs,
-                            validatorFieldsProofs: proofs.validatorFieldsProofs,
-                            validatorFields: proofs.validatorFields,
-                            withdrawalFields: proofs.withdrawalFields
+                            withdrawalJournals: withdrawalJournals
                         });
 
                         uint64 withdrawableAfter = pod.withdrawableRestakedExecutionLayerGwei();
