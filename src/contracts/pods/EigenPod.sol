@@ -236,7 +236,7 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
     function verifyAndProcessWithdrawals(
         uint64 oracleTimestamp,
         BeaconChainProofs.StateRootProof calldata stateRootProof,
-        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals,
+        BeaconChainProofs.WithdrawalJournals calldata withdrawalJournals,
         bytes calldata seal,
         address verifier //TODO: remove this parameter and add it to the EigenPod constructor 
     ) external onlyWhenNotPaused(PAUSED_EIGENPODS_VERIFY_WITHDRAWAL) {
@@ -248,7 +248,7 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
         // );
 
         IRiscZeroVerifier verifier = IRiscZeroVerifier(verifier);
-        bytes32 journalDigest = sha256(abi.encode(withdrawalJournals[0]));
+        bytes32 journalDigest = sha256(abi.encode(withdrawalJournals.journals[0]));
         verifier.verify(seal, imageId, journalDigest);
         
         // Verify passed-in beaconStateRoot against oracle-provided block root:
@@ -259,10 +259,10 @@ contract EigenPod is IEigenPod, Initializable, ReentrancyGuardUpgradeable, Eigen
         });
 
         VerifiedWithdrawal memory withdrawalSummary;
-        for (uint256 i = 0; i < withdrawalJournals.length; i++) {
+        for (uint256 i = 0; i < withdrawalJournals.journals.length; i++) {
             VerifiedWithdrawal memory verifiedWithdrawal = _verifyAndProcessWithdrawal(
                 stateRootProof.beaconStateRoot,
-                withdrawalJournals[i]
+                withdrawalJournals.journals[i]
             );
 
             withdrawalSummary.amountToSendGwei += verifiedWithdrawal.amountToSendGwei;

@@ -713,6 +713,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
     bytes32 beaconStateRoot;
     BeaconChainProofs.WithdrawalProof withdrawalToProve;
     BeaconChainProofs.WithdrawalJournal withdrawalJournal;
+    BeaconChainProofs.WithdrawalJournals withdrawalJournals;
     bytes validatorFieldsProof;
     bytes32[] validatorFields;
     bytes32[] withdrawalFields;
@@ -735,7 +736,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         cheats.expectRevert("EigenPod.proofIsForValidTimestamp: beacon chain proof must be at or after mostRecentWithdrawalTimestamp");
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
     }
 
@@ -751,7 +752,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         cheats.expectRevert("EigenPod._verifyAndProcessWithdrawal: Validator never proven to have withdrawal credentials pointed to this contract");
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
     }
 
@@ -763,14 +764,14 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         // Process withdrawal
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
 
         // Attempt to process again
         cheats.expectRevert("EigenPod._verifyAndProcessWithdrawal: withdrawal has already been proven for this timestamp");
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
     }
 
@@ -782,7 +783,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         // Process withdrawal
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
 
         // Verify storage
@@ -804,7 +805,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         // Process withdrawal
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
 
         // Verify storage
@@ -825,7 +826,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         cheats.expectRevert("EigenPod.proofIsForValidTimestamp: beacon chain proof must be at or after mostRecentWithdrawalTimestamp");
         eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
     }
 
@@ -846,7 +847,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         emit FullWithdrawalRedeemed(validatorIndex, withdrawalTimestamp, podOwner, withdrawalAmountGwei);
         IEigenPod.VerifiedWithdrawal memory vw = eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
 
         // Storage checks in _verifyAndProcessWithdrawal
@@ -879,7 +880,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         // Process full withdrawal
         IEigenPod.VerifiedWithdrawal memory vw = eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
 
         // Storage checks in _verifyAndProcessWithdrawal
@@ -917,7 +918,7 @@ contract EigenPodUnitTests_WithdrawalTests is EigenPodHarnessSetup, ProofParsing
         emit PartialWithdrawalRedeemed(validatorIndex, withdrawalTimestamp, podOwner, withdrawalAmountGwei);
         IEigenPod.VerifiedWithdrawal memory vw = eigenPodHarness.verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals
         );
 
         // Storage checks in _verifyAndProcessWithdrawal

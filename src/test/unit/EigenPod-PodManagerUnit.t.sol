@@ -180,7 +180,7 @@ contract EigenPod_PodManager_UnitTests_EigenPodPausing is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray,
+            BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
             bytes(""),
             address(riscZeroVerifier)
         );
@@ -408,7 +408,7 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray,
+            BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
             seal,
             address(riscZeroVerifier)
         );
@@ -475,7 +475,7 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray,
+            BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
             seal,
             address(riscZeroVerifier)
         );
@@ -523,7 +523,7 @@ contract EigenPod_PodManager_UnitTests_EigenPodManager is EigenPod_PodManager_Un
         eigenPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray,
+            BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
             seal,
             address(riscZeroVerifier)
         );

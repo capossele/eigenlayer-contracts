@@ -699,7 +699,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             pod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalJournalsArray,
+                BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
                 seal,
                 riscZeroVerifier
             );
@@ -724,7 +724,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             pod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalJournalsArray,
+                BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
                 seal,
                 riscZeroVerifier
             );
@@ -779,7 +779,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             newPod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalJournalsArray,
+                BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
                 seal,
                 riscZeroVerifier
             );
@@ -831,7 +831,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         newPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray,
+            BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
             seal,
             riscZeroVerifier
         );
@@ -866,7 +866,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
         newPod.verifyAndProcessWithdrawals(
             0,
             stateRootProofStruct,
-            withdrawalJournalsArray,
+            BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
             seal,
             riscZeroVerifier
         );
@@ -1523,7 +1523,7 @@ contract EigenPodTests is ProofParsing, EigenPodPausingConstants {
             newPod.verifyAndProcessWithdrawals(
                 0,
                 stateRootProofStruct,
-                withdrawalJournalsArray,
+                BeaconChainProofs.WithdrawalJournals(withdrawalJournalsArray),
                 seal,
                 riscZeroVerifier
             );

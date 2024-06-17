@@ -46,11 +46,11 @@ contract EPInternalFunctions is EigenPod, Test {
 
     function verifyAndProcessWithdrawal(
         bytes32 beaconStateRoot,
-        BeaconChainProofs.WithdrawalJournal calldata withdrawalJournal
+        BeaconChainProofs.WithdrawalJournals calldata withdrawalJournals
     ) public returns (IEigenPod.VerifiedWithdrawal memory) {
         return _verifyAndProcessWithdrawal(
             beaconStateRoot,
-            withdrawalJournal
+            withdrawalJournals.journals[0]
         );
     }
 

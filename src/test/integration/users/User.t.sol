@@ -332,7 +332,7 @@ contract User is Test {
                         pod.verifyAndProcessWithdrawals({
                             oracleTimestamp: proofs.oracleTimestamp,
                             stateRootProof: proofs.stateRootProof,
-                            withdrawalJournals: withdrawalJournals,
+                            withdrawalJournals: BeaconChainProofs.WithdrawalJournals(withdrawalJournals),
                             seal: bytes(""),
                             verifier: riscZeroVerifier
                         });

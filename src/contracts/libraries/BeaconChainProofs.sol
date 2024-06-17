@@ -106,6 +106,11 @@ library BeaconChainProofs {
         bytes32 validatorPubkeyHash;
     }
 
+    /// @notice This struct contains the data needed to verify a partial/full withdrawal zk proof
+    struct WithdrawalJournals {
+        WithdrawalJournal[] journals;
+    }
+
     /// @notice This struct contains the root and proof for verifying the state root against the oracle block root
     struct StateRootProof {
         bytes32 beaconStateRoot;

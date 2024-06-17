@@ -197,7 +197,7 @@ interface IEigenPod {
     function verifyAndProcessWithdrawals(
         uint64 oracleTimestamp,
         BeaconChainProofs.StateRootProof calldata stateRootProof,
-        BeaconChainProofs.WithdrawalJournal[] calldata withdrawalJournals,
+        BeaconChainProofs.WithdrawalJournals calldata withdrawalJournals,
         bytes calldata seal,
         address verifier //TODO: remove this parameter and add it to the EigenPod constructor
     ) external;
